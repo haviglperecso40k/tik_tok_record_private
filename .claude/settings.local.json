@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c ':*)",
+      "Bash(python debug_stream.py)",
+      "Bash(python main.py -user hien31083005 -no-update-check)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(timeout 12 python main.py -mode watchlist -no-update-check)",
+      "Bash(pip install:*)",
+      "Bash(timeout 40 python -c ':*)",
+      "Bash(timeout 45 python -c ':*)",
+      "Bash(timeout 50 python -c ':*)",
+      "Bash(timeout 20 python main.py -mode watchlist -user vqk411,huyhoanghyper,_pullllllll_ -automatic_interval 3 -no-update-check)"
+    ]
+  }
+}

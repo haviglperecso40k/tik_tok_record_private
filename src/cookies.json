@@ -1,4 +1,12 @@
 {
-  "sessionid_ss": "",
-  "tt-target-idc": "useast2a"
+  "sessionid": "62fcd642175492b4d44ac02a0fa179e5",
+  "sessionid_ss": "62fcd642175492b4d44ac02a0fa179e5",
+  "sid_tt": "62fcd642175492b4d44ac02a0fa179e5",
+  "uid_tt": "2dda21f366859fb8008da6aeb8003f6d36251888a2b7bdf4c411b0ad61666009",
+  "uid_tt_ss": "2dda21f366859fb8008da6aeb8003f6d36251888a2b7bdf4c411b0ad61666009",
+  "tt-target-idc": "alisg",
+  "ttwid": "1%7CFX2aVqpOhNKfGhr7oVWGWfnVsTWF4Qn_dYTs1nN_l5E%7C1775904179%7Cf268ecb9a73f09d86e780af3b8a69a0dbe7155ed1c52f3f037e38954c7496092",
+  "odin_tt": "467d8b9e8c672b19f8fdf195653ba8eb508ecede950f99f6a4d0ea5fd8ce0d0910c8ec9d5d7b58f256702ef4e377224d4806ae8ad3f68882c4b2e8e2ee95be56195f422a2b931bbb973d38ed3ddb140c",
+  "tt_csrf_token": "PV9Tu9HC-o0_6CqWEcFKhRsBkgT0lCdcdsFg",
+  "msToken": "YVZuXMiLroIVDemJ5w-9jV-WOfNoQO29QfnDifz1AQ-xVthK30aHPKx-H-l59Nb9A1wl4LZ5yB8i7SYwllwdg7CJaVWWLA295mrN3whFH5P3qie06-9wrwgqnaJTtewWwgKFCyEVdBA7lOk="
 }

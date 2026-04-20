@@ -133,6 +133,8 @@ dmypy.json
 *.flv
 cookies.json
 telegram.json
+src/www.tiktok.com_cookies.txt
+www.tiktok.com_cookies.txt
 
 # telegram session file
 *.session

@@ -1,4 +1,5 @@
 import argparse
+import os
 import re
 
 from utils.custom_exceptions import ArgsParseError
@@ -39,10 +40,11 @@ def parse_args():
         "-mode",
         dest="mode",
         help=(
-            "Recording mode: (manual, automatic, followers) [Default: manual]\n"
+            "Recording mode: (manual, automatic, followers, watchlist) [Default: manual]\n"
             "[manual] => Manual live recording.\n"
             "[automatic] => Automatic live recording when the user is live.\n"
-            "[followers] => Automatic live recording of followed users."
+            "[followers] => Automatic live recording of followed users.\n"
+            "[watchlist] => Automatic recording of users listed in watchlist.txt."
         ),
         default="manual",
         action='store'
@@ -54,6 +56,61 @@ def parse_args():
         help="Sets the interval in minutes to check if the user is live in automatic mode. [Default: 5]",
         type=int,
         default=5,
+        action='store'
+    )
+
+    parser.add_argument(
+        "-watchlist_file",
+        dest="watchlist_file",
+        help=(
+            "Path to the watchlist/username file. "
+            "[Default: watchlist.txt next to main.py]"
+        ),
+        action='store'
+    )
+
+    parser.add_argument(
+        "-shard_index",
+        dest="shard_index",
+        help="Zero-based shard index for watchlist mode. [Default: 0]",
+        type=int,
+        default=0,
+        action='store'
+    )
+
+    parser.add_argument(
+        "-shard_count",
+        dest="shard_count",
+        help="Total number of shards for watchlist mode. [Default: 1]",
+        type=int,
+        default=1,
+        action='store'
+    )
+
+    parser.add_argument(
+        "-max_workers",
+        dest="max_workers",
+        help="Maximum parallel live checks per process in watchlist mode. [Default: 3]",
+        type=int,
+        default=3,
+        action='store'
+    )
+
+    parser.add_argument(
+        "-jitter_seconds",
+        dest="jitter_seconds",
+        help="Maximum random delay in seconds added to startup and polling. [Default: 30]",
+        type=int,
+        default=30,
+        action='store'
+    )
+
+    parser.add_argument(
+        "-backoff_minutes",
+        dest="backoff_minutes",
+        help="Delay in minutes after rate-limit/WAF signals in watchlist mode. [Default: 15]",
+        type=int,
+        default=15,
         action='store'
     )
 
@@ -113,13 +170,44 @@ def validate_and_parse_args():
     args = parse_args()
 
     if not args.mode:
-        raise ArgsParseError("Missing mode value. Please specify the mode (manual, automatic or followers).")
-    if args.mode not in ["manual", "automatic", "followers"]:
-        raise ArgsParseError("Incorrect mode value. Choose between 'manual', 'automatic' or 'followers'.")
+        raise ArgsParseError("Missing mode value. Please specify the mode (manual, automatic, followers or watchlist).")
+    if args.mode not in ["manual", "automatic", "followers", "watchlist"]:
+        raise ArgsParseError("Incorrect mode value. Choose between 'manual', 'automatic', 'followers' or 'watchlist'.")
 
     if args.mode in ["manual", "automatic"]:
         if not args.user and not args.room_id and not args.url:
             raise ArgsParseError("Missing URL, username, or room ID. Please provide one of these parameters.")
+
+    if args.shard_count < 1:
+        raise ArgsParseError("Incorrect shard_count value. Must be one or more.")
+
+    if args.shard_index < 0 or args.shard_index >= args.shard_count:
+        raise ArgsParseError("Incorrect shard_index value. Must be between 0 and shard_count - 1.")
+
+    if args.max_workers < 1:
+        raise ArgsParseError("Incorrect max_workers value. Must be one or more.")
+
+    if args.jitter_seconds < 0:
+        raise ArgsParseError("Incorrect jitter_seconds value. Must be zero or more.")
+
+    if args.backoff_minutes < 1:
+        raise ArgsParseError("Incorrect backoff_minutes value. Must be one minute or more.")
+
+    if args.watchlist_file:
+        args.watchlist_file = os.path.abspath(args.watchlist_file)
+
+    if args.mode == "watchlist" and args.user:
+        # ghi thẳng vào watchlist.txt
+        watchlist_path = args.watchlist_file or os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            'watchlist.txt'
+        )
+        users = [u.lstrip('@').strip() for u in args.user.split(',') if u.strip()]
+        with open(watchlist_path, 'w', encoding='utf-8') as f:
+            f.write("# Auto-generated from -user argument\n")
+            for u in users:
+                f.write(u + "\n")
+        args.user = None  # watchlist_mode tự đọc file
 
     if args.user:
         args.user = [u.lstrip('@').strip() for u in args.user.split(',') if u.strip()]
@@ -151,5 +239,7 @@ def validate_and_parse_args():
         mode = Mode.AUTOMATIC
     elif args.mode == "followers":
         mode = Mode.FOLLOWERS
+    elif args.mode == "watchlist":
+        mode = Mode.WATCHLIST
 
     return args, mode

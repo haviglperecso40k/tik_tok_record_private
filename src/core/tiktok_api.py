@@ -72,7 +72,7 @@ class TikTokAPI:
         Given a room_id, I get the username
         """
         data = self.http_client.get(
-            f"{self.WEBCAST_URL}/webcast/room/info/?aid=1988&room_id={room_id}"
+            f"{self.WEBCAST_URL}/webcast/room/info/?aid=1988&room_id={room_id}&version_code=180800"
         ).json()
 
         if 'Follow the creator to watch their LIVE' in json.dumps(data):
@@ -212,11 +212,17 @@ class TikTokAPI:
         Return the cdn (flv or m3u8) of the streaming
         """
         data = self.http_client.get(
-            f"{self.WEBCAST_URL}/webcast/room/info/?aid=1988&room_id={room_id}"
+            f"{self.WEBCAST_URL}/webcast/room/info/?aid=1988&room_id={room_id}&version_code=180800"
         ).json()
 
         if 'This account is private' in data:
             raise UserLiveError(TikTokError.ACCOUNT_PRIVATE)
+
+        if data.get('status_code') == 4003110:
+            raise UserLiveError(TikTokError.LIVE_RESTRICTION)
+
+        if 'Follow the creator to watch their LIVE' in json.dumps(data):
+            raise UserLiveError(TikTokError.ACCOUNT_PRIVATE_FOLLOW)
 
         stream_url = data.get('data', {}).get('stream_url', {})
 
@@ -233,8 +239,13 @@ class TikTokAPI:
         sdk_data = json.loads(sdk_data_str).get('data', {})
         qualities = stream_url.get('live_core_sdk_data', {}).get('pull_data', {}).get('options', {}).get('qualities', [])
         if not qualities:
-            logger.warning("No qualities found in the stream data. Returning None.")
-            return None
+            logger.warning("No qualities found in the stream data. Falling back to legacy URLs.")
+            return (stream_url.get('flv_pull_url', {}).get('FULL_HD1') or
+                    stream_url.get('flv_pull_url', {}).get('HD1') or
+                    stream_url.get('flv_pull_url', {}).get('SD2') or
+                    stream_url.get('flv_pull_url', {}).get('SD1') or
+                    stream_url.get('rtmp_pull_url', '') or
+                    None)
         level_map = {q['sdk_key']: q['level'] for q in qualities}
 
         best_level = -1

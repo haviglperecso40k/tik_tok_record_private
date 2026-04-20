@@ -35,6 +35,7 @@ class Mode(IntEnum):
     MANUAL = 0
     AUTOMATIC = 1
     FOLLOWERS = 2
+    WATCHLIST = 3
 
 
 class Error(Enum):
@@ -73,6 +74,15 @@ class TikTokError(Enum):
         'Followers mode is available only in unblocked countries. ' \
         'Use a VPN or authenticate with cookies.\n' \
         'How to set cookies: https://github.com/Michele0303/tiktok-live-recorder/blob/main/GUIDE.md#how-to-set-cookies\n'
+
+    COUNTRY_BLACKLISTED_WATCHLIST_MODE = \
+        'Watchlist mode is available only in unblocked countries. ' \
+        'Use a VPN or authenticate with cookies.\n' \
+        'How to set cookies: https://github.com/Michele0303/tiktok-live-recorder/blob/main/GUIDE.md#how-to-set-cookies\n'
+
+    WATCHLIST_FILE_NOT_FOUND = 'watchlist.txt not found. Create it in the same directory as main.py with one username per line.'
+
+    WATCHLIST_EMPTY = 'watchlist.txt is empty. Add at least one username.'
 
     ACCOUNT_PRIVATE = 'Account is private, login required. ' \
                       'Please add your cookies to cookies.json ' \

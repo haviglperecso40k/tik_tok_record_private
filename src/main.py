@@ -8,7 +8,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 def record_user(
     user, url, room_id, mode, interval, proxy, output, duration,
-    use_telegram, cookies
+    use_telegram, cookies, watchlist_file, shard_index, shard_count,
+    max_workers, jitter_seconds, backoff_minutes
 ):
     from core.tiktok_recorder import TikTokRecorder
     from utils.logger_manager import logger
@@ -24,6 +25,12 @@ def record_user(
             output=output,
             duration=duration,
             use_telegram=use_telegram,
+            watchlist_file=watchlist_file,
+            shard_index=shard_index,
+            shard_count=shard_count,
+            max_workers=max_workers,
+            jitter_seconds=jitter_seconds,
+            backoff_minutes=backoff_minutes,
         ).run()
     except Exception as e:
         logger.error(f"{e}")
@@ -45,7 +52,13 @@ def run_recordings(args, mode, cookies):
                     args.output,
                     args.duration,
                     args.telegram,
-                    cookies
+                    cookies,
+                    args.watchlist_file,
+                    args.shard_index,
+                    args.shard_count,
+                    args.max_workers,
+                    args.jitter_seconds,
+                    args.backoff_minutes
                 )
             )
             p.start()
@@ -63,7 +76,13 @@ def run_recordings(args, mode, cookies):
             args.output,
             args.duration,
             args.telegram,
-            cookies
+            cookies,
+            args.watchlist_file,
+            args.shard_index,
+            args.shard_count,
+            args.max_workers,
+            args.jitter_seconds,
+            args.backoff_minutes
         )
 
 
